@@ -1,5 +1,5 @@
 import logging
-
+from typing import Tuple
 import numpy as np
 import pandas as pd
 from src.evaluation import MSE, RMSE, R2Score
@@ -7,12 +7,12 @@ from sklearn.base import RegressorMixin
 from typing_extensions import Annotated
 from zenml import step
 from zenml.client import Client
+import mlflow
 
-# experiment_tracker = Client().active_stack.experiment_tracker
-from typing import Tuple
+experiment_tracker = Client().active_stack.experiment_tracker
 
 
-@step
+@step(experiment_tracker = experiment_tracker.name)
 def evaluation_model(
     model: RegressorMixin, x_test: pd.DataFrame, y_test: pd.DataFrame
 ) -> Tuple[Annotated[float, "r2_score"], Annotated[float, "rmse"]]:
@@ -41,12 +41,12 @@ def evaluation_model(
         # Using the MSE class for mean squared error calculation
         mse_class = MSE() 
         mse = mse_class.calculate_score(y_test, prediction)
-        # mlflow.log_metric("mse", mse)
+        mlflow.log_metric("mse", mse)
 
         # Using the R2Score class for R2 score calculation
         r2_class = R2Score()
         r2_score = r2_class.calculate_score(y_test, prediction)
-        # mlflow.log_metric("r2_score", r2_score)
+        mlflow.log_metric("r2_score", r2_score)
 
         # Using the RMSE class for root mean squared error calculation
         rmse_class = RMSE()
