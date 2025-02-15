@@ -7,9 +7,11 @@ from steps.evaluation import evaluation_model
 @pipeline
 def train_pipeline(data_path:str):
     df = ingest_df(data_path)
-    clean_df(df)
-    train_model(df)
-    evaluation_model(df)
+    X_train , X_test , Y_train , Y_test = clean_df(df)
+    model = train_model(X_train , X_test , Y_train , Y_test )
+    r2_score  , rmse = evaluation_model(model , X_test , Y_test)
+    
+
 
 
 
